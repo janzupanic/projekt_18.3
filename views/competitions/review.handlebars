@@ -13,7 +13,7 @@ h1 {
     }
     
 th {
-    padding: 10px;
+    padding: 30px;
 }
 
     .center {
@@ -38,8 +38,7 @@ th {
 
         <tr>
 <h1>{{result.items.[0].competition}}</h1>
-            <h1 x-data="{}">
-                        <span x-text="new Date('{{this.apply_till}}').toLocaleString()"></span>
+            <h1>Datum natjecanja:  {{result.items.[0].apply_till}}
                     </h1>
             {{#each result.items}}
 
