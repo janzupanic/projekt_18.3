@@ -1,0 +1,34 @@
+<div class="overflow-x-auto">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>IME I PREZIME</th>
+                <th>NAZIV NATJECANJA</th>
+                <th>DATUM PRIJAVE</th>
+                <th>UKUPNI BROJ BODOVA</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each result.items}}
+            <tr id="row-{{this.id}}">
+                <td>{{this.id}}</td>
+                <td>{{this.participant}}</td>
+                <td>{{this.competition}}</td>
+                <td>{{this.appeared_At}}</td>
+                <td>{{this.points}}</td>
+                <td class="flex flex-wrap gap-2">
+                    {{#if ../user.is_admin}}
+                    <form id="form-{{this.id}}" method="post" action="/competitions/points/{{this.id}}" class="flex items-center">
+                        <input type="text" name="score" placeholder="Unesite broj bodova natjecatelja" class="input input-bordered w-full max-w-xs mr-2" style="width: 230px;" />
+                        <input type="hidden" name="_method" value="PUT">
+                        <input type="submit" class="btn btn-primary" value="Potvrda unosa"/>
+                    </form>
+                    {{/if}}
+                </td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</div>

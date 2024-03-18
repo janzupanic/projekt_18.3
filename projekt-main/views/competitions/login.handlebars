@@ -1,0 +1,35 @@
+<div>
+
+
+    {{#if result.signedUp}}
+    <div class="mt-4">
+        <div class="card w-96 bg-primary text-primary-content">
+            <div class="card-body">
+                <h2 class="card-title">Uspjeh!</h2>
+                <p>
+                    Uspješno ste se prijavili na ovo natjecanje!
+                </p>
+                <div class="card-actions justify-end">
+                    <a class="btn" href="/competitions">Nastavi na prikaz natjecanja</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{/if}}
+
+
+     {{#if result.alreadySignedUp}}
+     <div class="mt-4">
+    <div class="card w-96 bg-error text-black">
+        <div class="card-body">
+            <h2 class="card-title">Greška!</h2>
+            <p>
+                Već ste prijavljeni!
+            </p>
+        </div>
+    </div>
+</div>
+     {{/if}}
+
+
+</div>
