@@ -30,10 +30,14 @@ router.get("/delete/:id", adminRequired, function (req, res, next) {
         throw new Error("Neispravan poziv");
     }
 
-    const stmt = db.prepare("DELETE FROM competitions WHERE id = ?;");
+    const stmt = db.prepare("DELETE FROM participants WHERE competition_id = ?;");
     const deleteResult = stmt.run(req.params.id);
 
-    if (!deleteResult.changes || deleteResult.changes !== 1) {
+
+    const stmt1 = db.prepare("DELETE FROM competitions WHERE id = ?;");
+    const deleteResult1 = stmt1.run(req.params.id);
+
+    if (!deleteResult1.changes || deleteResult1.changes !== 1) {
         throw new Error("Operacija nije uspjela");
     }
 
@@ -63,7 +67,7 @@ router.get("/edit/:id", adminRequired, function (req, res, next) {
 
 // POST /competitions/edit/:id
 router.get("/edit", adminRequired, function (req, res, next) {
-   
+
 });
 
 
@@ -140,7 +144,7 @@ router.get("/", authRequired, function (req, res, next) {
     const result = stmt.all();
 
     res.render("competitions/points", { result: { items: result } });
-    
+
 });
 
 
@@ -157,7 +161,7 @@ router.get("/login/:id", function (req, res, next) {
     }
 
     const stmt = db.prepare(
-        "INSERT INTO participants (user_id, competition_id) VALUES (?, ?);"
+        "INSERT INTO participants (user_id, competition_id, appeared_At) VALUES (?, ?, ?);"
     );
 
 
@@ -172,65 +176,84 @@ router.get("/login/:id", function (req, res, next) {
         res.render("competitions/login", { result: { alreadySignedUp: true } });
 
     }
-    if(!existingSignUp){
-    const signUpResult = stmt.run(req.user.sub, req.params.id);
+    if (!existingSignUp) {
+        const signUpResult = stmt.run(req.user.sub, req.params.id, new Date().toISOString());
 
 
-    if (signUpResult.changes && signUpResult.changes === 1) {
-        res.render("competitions/login", { result: { signedUp: true } });
+        if (signUpResult.changes && signUpResult.changes === 1) {
+            res.render("competitions/login", { result: { signedUp: true } });
 
-    } else {
-        res.render("competitions/login", { result: { database_error: true } });
+        } else {
+            res.render("competitions/login", { result: { database_error: true } });
+        }
     }
-}
 
 
 });
 
 // GET /competitions/score/:id
 router.get("/points/:id", function (req, res, next) {
-  // do validation
-  const result = schema_id.validate(req.params);
-  if (result.error) {
-    throw new Error("Neispravan poziv");
-  }
+    // do validation
+    const result = schema_id.validate(req.params);
+    if (result.error) {
+        throw new Error("Neispravan poziv");
+    }
 
-  const stmt = db.prepare(
-    "SELECT p.id, u.name AS participant, p.appeared_At, p.points, c.name AS competition FROM participants p JOIN users u ON p.user_id = u.id JOIN competitions c ON p.competition_id = c.id WHERE c.id = ? ORDER BY p.points"
-  );
-  const dbResult = stmt.all(req.params.id);
+    const stmt = db.prepare(
+        "SELECT p.id, u.name AS participant, p.appeared_At, p.points, c.name AS competition FROM participants p JOIN users u ON p.user_id = u.id JOIN competitions c ON p.competition_id = c.id WHERE c.id = ? ORDER BY p.points DESC"
+    );
+    const dbResult = stmt.all(req.params.id);
 
-  res.render("competitions/points", { result: { items: dbResult } });
+    res.render("competitions/points", { result: { items: dbResult } });
 });
 
 // POST /competitions/score/:id
 router.post("/points/:id", authRequired, function (req, res, next) {
-  // do validation
-  const result = schema_id.validate({ id: req.params.id }); // Validacija ID-a
-  if (result.error) {
-    throw new Error("Neispravan poziv");
-  }
+    // do validation
+    const result = schema_id.validate({ id: req.params.id }); // Validacija ID-a
+    if (result.error) {
+        throw new Error("Neispravan poziv");
+    }
 
-  const score = parseInt(req.body.score);
+    const score = parseInt(req.body.score);
 
-  if (isNaN(score)) {
-    res.render("competitions/points", {
-      result: { validation_error: true },
-    });
-    return;
-  }
+    if (isNaN(score)) {
+        res.render("competitions/points", {
+            result: { validation_error: true },
+        });
+        return;
+    }
 
-  const stmt = db.prepare("UPDATE participants SET points = ? WHERE id = ?;");
-  const updateResult = stmt.run(score, req.params.id); // Ovdje koristimo req.params.id
+    const stmt = db.prepare("UPDATE participants SET points = ? WHERE id = ?;");
+    const updateResult = stmt.run(score, req.params.id); // Ovdje koristimo req.params.id
 
-  if (updateResult.changes && updateResult.changes === 1) {
-    res.redirect("/competitions");
-  } else {
-    res.render("/competitions/form", {
-      result: { database_error: true },
-    });
-    return;
-  }
+    if (updateResult.changes && updateResult.changes === 1) {
+        res.redirect("/competitions");
+    } else {
+        res.render("/competitions/form", {
+            result: { database_error: true },
+        });
+        return;
+    }
+});
+
+
+
+// GET /competitions/score/:id
+router.get("/review/:id", function (req, res, next) {
+    // do validation
+    const result = schema_id.validate(req.params);
+    if (result.error) {
+        throw new Error("Neispravan poziv");
+    }
+    
+    const stmt = db.prepare(
+        "SELECT  u.name AS participant, p.appeared_At, p.points, c.name AS competition FROM participants p JOIN users u ON p.user_id = u.id JOIN competitions c ON p.competition_id = c.id WHERE c.id = ? ORDER BY p.points DESC"
+    );
+    const dbResult = stmt.all(req.params.id);
+    
+    res.render("competitions/review", { result: { items: dbResult } });
+    
 });
 
 
