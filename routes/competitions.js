@@ -129,6 +129,7 @@ router.post("/add", adminRequired, function (req, res, next) {
     } else {
         res.render("competitions/form", { result: { database_error: true } });
     }
+   
 });
 
 
@@ -144,7 +145,7 @@ router.get("/", authRequired, function (req, res, next) {
     const result = stmt.all();
 
     res.render("competitions/points", { result: { items: result } });
-
+   
 });
 
 
@@ -248,7 +249,7 @@ router.get("/review/:id", function (req, res, next) {
     }
     
     const stmt = db.prepare(
-        "SELECT  u.name AS participant, p.appeared_At, p.points, c.name AS competition FROM participants p JOIN users u ON p.user_id = u.id JOIN competitions c ON p.competition_id = c.id WHERE c.id = ? ORDER BY p.points DESC"
+        "SELECT  u.name AS participant, c.apply_till, p.points, c.name AS competition FROM participants p JOIN users u ON p.user_id = u.id JOIN competitions c ON p.competition_id = c.id WHERE c.id = ? ORDER BY p.points DESC"
     );
     const dbResult = stmt.all(req.params.id);
     

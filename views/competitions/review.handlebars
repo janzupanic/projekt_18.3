@@ -1,5 +1,4 @@
 
-
 <div class="overflow-x-auto">
    
 
@@ -13,11 +12,9 @@ h1 {
         text-align: center;
     }
     
-    table,tr,td {
-        border-color: white;
-        border-width: 5px;
-    }
-
+th {
+    padding: 10px;
+}
 
     .center {
   margin-left: auto;
@@ -34,22 +31,28 @@ h1 {
 <tr>
   
         <th>IME I PREZIME</th>
-        <th>DATUM NATJECANJA</th>
+
         <th>UKUPNI BROJ BODOVA</th>
 
         </tr>
 
         <tr>
+<h1>{{result.items.[0].competition}}</h1>
+            <h1 x-data="{}">
+                        <span x-text="new Date('{{this.apply_till}}').toLocaleString()"></span>
+                    </h1>
             {{#each result.items}}
 
 
-            <h1>{{this.competition}}</h1>
+             
             <td>{{this.participant}}</td>
-            <td>{{this.appeared_At}}</td>
+       
+            
             <td>{{this.points}}</td>
 
             </tr>
             {{/each}}
+            
 </table>
     
     </body>
